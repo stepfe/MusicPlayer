@@ -3,7 +3,10 @@ package ru.stepf.musicplayer;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-
+//TODO ускорить поиск
+//TODO сделать фоном?
+//TODO сделать поиск по всем папкам
+//TODO следить за файлами(удаление)?
 public class Searcher {
     File dir;
     FilenameFilter musicFilter;

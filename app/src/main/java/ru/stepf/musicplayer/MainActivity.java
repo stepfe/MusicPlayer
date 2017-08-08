@@ -10,9 +10,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+
+//TODO длительность и перемотка
+//TODO плейлисты
+//TODO виджет на главной панели
+//TODO виджет
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,13 +26,14 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> playList;
     private ArrayList<File> fileList;
     private MediaPlayer mMediaPlayer;
-    private int track = -1;
+    private int track = -1;//TODO вначале должен быть выбран первый трек
 
     private ArrayAdapter<String> musicAdapter;
     private ListView lstMusic;
     private Button btnPlay;
     private Button btnNext;
     private Button btnPrev;
+    private TextView lblName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +44,11 @@ public class MainActivity extends AppCompatActivity {
         btnPlay = (Button)findViewById(R.id.btnPlay);
         btnNext = (Button)findViewById(R.id.btnNext);
         btnPrev = (Button)findViewById(R.id.btnPrev);
+        lblName = (TextView)findViewById(R.id.lblName);
 
 
         mSearcher = new Searcher(Environment.getExternalStorageDirectory()+"/Музыка");
-        mMediaPlayer = MediaPlayer.create(this, R.raw.music);
+        mMediaPlayer = MediaPlayer.create(this, R.raw.music);//TODO изменить на первый трек
         playList = new ArrayList<>();
         fileList = mSearcher.search();
 
@@ -56,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             playList.add(fileList.get(i).getName());
         }
 
-        musicAdapter = new ArrayAdapter(this,R.layout.list_item, playList);
+        musicAdapter = new ArrayAdapter<>(this,R.layout.list_item, playList);
         lstMusic.setAdapter(musicAdapter);
     }
 
@@ -73,10 +81,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void play(int index){
         mMediaPlayer.release();
-        mMediaPlayer = MediaPlayer.create(this, Uri.fromFile(fileList.get(index)));
+        mMediaPlayer = MediaPlayer.create(this, Uri.fromFile(fileList.get(index)));//TODO ПРОВЕРКА НА СУЩЕСТВОВАНИЕ
         mMediaPlayer.start();
         track = index;
         mMediaPlayer.setOnCompletionListener(mMediaPlayerOnCompletionListener);
+        lblName.setText(playList.get(index));
     }
 
     Button.OnClickListener btnPlayListener = new View.OnClickListener() {
@@ -93,22 +102,22 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer.OnCompletionListener mMediaPlayerOnCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            if(track == playList.size() - 1){
-                play(0);
-            }else {
-                play(track + 1);
-            }
+            playNext();
         }
     };
+
+    private void playNext(){
+        if(track == playList.size() - 1){
+            play(0);
+        }else {
+            play(track + 1);
+        }
+    }
 
     Button.OnClickListener nextClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(track == playList.size() - 1){
-                play(0);
-            }else {
-                play(track + 1);
-            }
+            playNext();
         }
     };
 
