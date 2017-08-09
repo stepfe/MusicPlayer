@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> playList;
     private ArrayList<File> fileList;
     private MediaPlayer mMediaPlayer;
-    private int track = -1;//TODO вначале должен быть выбран первый трек
+    private int track = 0;
 
     private ArrayAdapter<String> musicAdapter;
     private ListView lstMusic;
@@ -48,17 +48,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         mSearcher = new Searcher(Environment.getExternalStorageDirectory()+"/Музыка");
-        mMediaPlayer = MediaPlayer.create(this, R.raw.music);//TODO изменить на первый трек
         playList = new ArrayList<>();
         fileList = mSearcher.search();
 
         btnPlay.setOnClickListener(btnPlayListener);
         btnNext.setOnClickListener(nextClickListener);
         btnPrev.setOnClickListener(prevClickListener);
-        mMediaPlayer.setOnCompletionListener(mMediaPlayerOnCompletionListener);
         lstMusic.setOnItemClickListener(musicListListener);
-
-
 
         for (int i = 0; i < fileList.size(); i++){
             playList.add(fileList.get(i).getName());
@@ -66,10 +62,9 @@ public class MainActivity extends AppCompatActivity {
 
         musicAdapter = new ArrayAdapter<>(this,R.layout.list_item, playList);
         lstMusic.setAdapter(musicAdapter);
+        play(0);
+        mMediaPlayer.pause();
     }
-
-
-
 
 
     ListView.OnItemClickListener musicListListener = new AdapterView.OnItemClickListener() {
@@ -80,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void play(int index){
-        mMediaPlayer.release();
+        if(mMediaPlayer != null)
+            mMediaPlayer.release();
         mMediaPlayer = MediaPlayer.create(this, Uri.fromFile(fileList.get(index)));//TODO ПРОВЕРКА НА СУЩЕСТВОВАНИЕ
         mMediaPlayer.start();
         track = index;
