@@ -1,35 +1,51 @@
 package ru.stepf.musicplayer;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
+import android.content.Context;
+import android.content.CursorLoader;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.widget.CursorAdapter;
+import android.widget.ListAdapter;
+import android.widget.SimpleCursorAdapter;
+
 //TODO ускорить поиск
 //TODO сделать фоном?
-//TODO сделать поиск по всем папкам
-//TODO следить за файлами(удаление)?
+//TODO избавиться от лишней фигни(звуков)
 public class Searcher {
-    File dir;
-    FilenameFilter musicFilter;
-    public Searcher(String dirPath)
+
+    ListAdapter mListAdapter;
+    Cursor mCursor;
+    final Uri mediaSrc = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+    public Searcher(Context context)
     {
-        dir = new File(dirPath);
-        musicFilter = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if(name.endsWith(".mp3"))
-                    return true;
-                return false;
-            }
-        };
+        String[] from = {MediaStore.MediaColumns.TITLE};
+        int[] to = {android.R.id.text1};
+
+        CursorLoader cursorLoader = new CursorLoader(context, mediaSrc, null, null, null, MediaStore.Audio.Media.TITLE);
+        mCursor = cursorLoader.loadInBackground();
+
+        mListAdapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1, mCursor, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
     }
 
-    public ArrayList<File> search() {
-        ArrayList<File> music = new ArrayList<>();
-        File[] list = dir.listFiles(musicFilter);
-        int length = list.length;
-        for (int i = 0; i < length; i++) {
-            music.add(dir.listFiles()[i]);
-        }
-        return music;
+    public ListAdapter search(){
+        return mListAdapter;
+    }
+
+    public String getName(int id){
+        String _id;
+        mCursor.moveToPosition(id);
+        _id = mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+        return _id;
+    }
+
+    public Uri getPath(int id){
+        String _id;
+        mCursor.moveToPosition(id);
+        _id = mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media._ID));
+
+        return Uri.withAppendedPath(mediaSrc, _id);
     }
 }

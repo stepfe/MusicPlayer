@@ -1,21 +1,17 @@
 package ru.stepf.musicplayer;
 
 import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.io.File;
-import java.util.ArrayList;
 
 //TODO: плейлисты
 //TODO: виджет на главной панели
@@ -23,14 +19,12 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private Searcher mSearcher;
-    private ArrayList<String> playList;
-    private ArrayList<File> fileList;
     private MediaPlayer mMediaPlayer;
     private Handler mHandler = new Handler();
     private int track = 0;
+    private int numOfTraks;
     int newPosition = 0;
 
-    private ArrayAdapter<String> musicAdapter;
     private ListView lstMusic;
     private Button btnPlay;
     private Button btnNext;
@@ -39,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView lblName;
     private TextView lblCurTime;
     private TextView lblDuration;
+    private ListAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +50,7 @@ public class MainActivity extends AppCompatActivity {
         lblDuration = (TextView) findViewById(R.id.lblDuration);
 
 
-        mSearcher = new Searcher(Environment.getExternalStorageDirectory() + "/Музыка");
-        playList = new ArrayList<>();
-        fileList = mSearcher.search();
+        mSearcher = new Searcher(this);
 
         btnPlay.setOnClickListener(btnPlayListener);
         btnNext.setOnClickListener(nextClickListener);
@@ -65,12 +58,13 @@ public class MainActivity extends AppCompatActivity {
         lstMusic.setOnItemClickListener(musicListListener);
         sbProgress.setOnSeekBarChangeListener(progressChangeListener);
 
-        for (int i = 0; i < fileList.size(); i++) {
-            playList.add(fileList.get(i).getName());
-        }
 
-        musicAdapter = new ArrayAdapter<>(this, R.layout.list_item, playList);
-        lstMusic.setAdapter(musicAdapter);
+        mAdapter = mSearcher.search();
+
+        lstMusic.setAdapter(mAdapter);
+
+        numOfTraks = lstMusic.getCount();
+
         play(0);//// TODO: ЕСЛИ МУЗЫКИ НЕТ!!!!
         mMediaPlayer.pause();
     }
@@ -109,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(mMediaPlayer != null)
             mMediaPlayer.release();
-        mMediaPlayer = MediaPlayer.create(this, Uri.fromFile(fileList.get(index)));//TODO ПРОВЕРКА НА СУЩЕСТВОВАНИЕ
+        mMediaPlayer = MediaPlayer.create(this, mSearcher.getPath(index));//TODO ПРОВЕРКА НА СУЩЕСТВОВАНИЕ
         mMediaPlayer.start();
         track = index;
 
@@ -122,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             minsMod = "0";
 
         mMediaPlayer.setOnCompletionListener(mMediaPlayerOnCompletionListener);
-        lblName.setText(playList.get(index));
+        lblName.setText(mSearcher.getName(index));
         sbProgress.setMax(mMediaPlayer.getDuration());
         lblDuration.setText(minsMod + mins + ":" + secMod + sec);
 
@@ -175,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void playNext(){
-        if(track == playList.size() - 1){
+        if(track == numOfTraks - 1){
             play(0);
         }else {
             play(track + 1);
@@ -193,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             if(track == 0){
-                play(playList.size() - 1);
+                play(numOfTraks - 1);
             }else {
                 play(track - 1);
             }
