@@ -20,7 +20,6 @@ import java.util.ArrayList;
 //TODO Вывод времени
 //TODO плейлисты
 //TODO виджет на главной панели
-//TODO виджет
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar sbProgress;
     private Button btnPrev;
     private TextView lblName;
+    private TextView lblCurTime;
+    private TextView lblDuration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         btnNext = (Button) findViewById(R.id.btnNext);
         btnPrev = (Button) findViewById(R.id.btnPrev);
         lblName = (TextView) findViewById(R.id.lblName);
+        lblCurTime = (TextView) findViewById(R.id.lblCurTime);
+        lblDuration = (TextView) findViewById(R.id.lblDuration);
 
 
         mSearcher = new Searcher(Environment.getExternalStorageDirectory() + "/Музыка");
@@ -100,14 +103,20 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void play(int index){
+        int mins;
+        int sec;
         if(mMediaPlayer != null)
             mMediaPlayer.release();
         mMediaPlayer = MediaPlayer.create(this, Uri.fromFile(fileList.get(index)));//TODO ПРОВЕРКА НА СУЩЕСТВОВАНИЕ
         mMediaPlayer.start();
         track = index;
+        sec = mMediaPlayer.getDuration() / 1000;
+        mins = sec / 60;
+        sec -= mins * 60;
         mMediaPlayer.setOnCompletionListener(mMediaPlayerOnCompletionListener);
         lblName.setText(playList.get(index));
         sbProgress.setMax(mMediaPlayer.getDuration());
+        lblDuration.setText(mins + ":" + sec);
         mHandler.removeCallbacks(timeUpdater);
         mHandler.postDelayed(timeUpdater, 100);
 

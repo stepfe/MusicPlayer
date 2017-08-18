@@ -15,7 +15,6 @@
         android:layout_height="wrap_content"
         android:text="Play"
         android:id="@+id/btnPlay"
-        android:layout_marginBottom="44dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
 
@@ -33,7 +32,7 @@
         android:layout_height="wrap_content"
         android:text="Prev"
         android:id="@+id/btnPrev"
-        android:layout_alignTop="@+id/btnPlay"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"/>
 
@@ -41,12 +40,9 @@
         android:id="@+id/sbProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/btnNext"/>
+        android:layout_above="@+id/btnPlay"
+        android:layout_toRightOf="@+id/lblCurTime"
+        android:layout_toLeftOf="@+id/lblDuration"/>
 
     <ListView
         android:id="@+id/lstMusic"
@@ -54,17 +50,38 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/lblName"/>
+        android:layout_above="@id/lblName"/>
 
     <TextView
         android:id="@+id/lblName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btnPrev"
+        android:layout_above="@+id/sbProgress"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
+        android:text="TextView"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/lblCurTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnPrev"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:text="TextView"/>
+
+    <TextView
+        android:id="@+id/lblDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/lblCurTime"
         android:text="TextView"/>
 
 </RelativeLayout>
