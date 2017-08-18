@@ -17,9 +17,8 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 
-//TODO Вывод времени
-//TODO плейлисты
-//TODO виджет на главной панели
+//TODO: плейлисты
+//TODO: виджет на главной панели
 
 public class MainActivity extends AppCompatActivity {
 
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         musicAdapter = new ArrayAdapter<>(this, R.layout.list_item, playList);
         lstMusic.setAdapter(musicAdapter);
-        play(0);
+        play(0);//// TODO: ЕСЛИ МУЗЫКИ НЕТ!!!!
         mMediaPlayer.pause();
     }
 
@@ -105,18 +104,28 @@ public class MainActivity extends AppCompatActivity {
     private void play(int index){
         int mins;
         int sec;
+        String minsMod = "";
+        String secMod = "";
+
         if(mMediaPlayer != null)
             mMediaPlayer.release();
         mMediaPlayer = MediaPlayer.create(this, Uri.fromFile(fileList.get(index)));//TODO ПРОВЕРКА НА СУЩЕСТВОВАНИЕ
         mMediaPlayer.start();
         track = index;
+
         sec = mMediaPlayer.getDuration() / 1000;
         mins = sec / 60;
         sec -= mins * 60;
+        if(sec < 10)
+            secMod = "0";
+        if(mins < 10)
+            minsMod = "0";
+
         mMediaPlayer.setOnCompletionListener(mMediaPlayerOnCompletionListener);
         lblName.setText(playList.get(index));
         sbProgress.setMax(mMediaPlayer.getDuration());
-        lblDuration.setText(mins + ":" + sec);
+        lblDuration.setText(minsMod + mins + ":" + secMod + sec);
+
         mHandler.removeCallbacks(timeUpdater);
         mHandler.postDelayed(timeUpdater, 100);
 
@@ -125,7 +134,22 @@ public class MainActivity extends AppCompatActivity {
     private Runnable timeUpdater = new Runnable() {
         @Override
         public void run() {
+            int mins;
+            int sec;
+            String minsMod = "";
+            String secMod = "";
+
+            sec = mMediaPlayer.getCurrentPosition() / 1000;
+            mins = sec / 60;
+            sec -= mins * 60;
+            if(sec < 10)
+                secMod = "0";
+            if(mins < 10)
+                minsMod = "0";
+
             sbProgress.setProgress(mMediaPlayer.getCurrentPosition());
+
+            lblCurTime.setText(minsMod + mins + ":" + secMod + sec);
             mHandler.postDelayed(this, 100);
         }
     };
@@ -135,8 +159,10 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             if(mMediaPlayer.isPlaying()){
                 mMediaPlayer.pause();
+                mHandler.removeCallbacks(timeUpdater);
             }else{
                 mMediaPlayer.start();
+                mHandler.postDelayed(timeUpdater, 100);
             }
         }
     };
